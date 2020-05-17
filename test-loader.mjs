@@ -1,10 +1,11 @@
-import loader from './packages/multiloader-loader/src/index.js';
-export * from './packages/multiloader-loader/src/index.js';
+import loader from './packages/multiloader-loader/src/loader.js';
+export * from './packages/multiloader-loader/src/loader.js';
 
-import https from './packages/multiloader-https/src/index.js';
-import json from './packages/multiloader-json/src/index.js';
-import typescript from './packages/multiloader-typescript/src/index.js';
-import yaml from './packages/multiloader-yaml/src/index.js';
+import https from './packages/multiloader-https/src/httpsLoader.js';
+import json from './packages/multiloader-json/src/jsonLoader.js';
+import typescript from './packages/multiloader-typescript/src/typescriptLoader.js';
+import yaml from './packages/multiloader-yaml/src/yamlLoader.js';
+import babel from './packages/multiloader-babel/src/babelLoader.js';
 
 loader(
   https({
@@ -12,5 +13,8 @@ loader(
   }),
   json(),
   typescript(),
+  babel({
+    presets: ['@babel/preset-react'],
+  }),
   yaml(),
 );

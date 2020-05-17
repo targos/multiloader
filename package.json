@@ -5,6 +5,9 @@
     "prepare": "lerna bootstrap"
   },
   "devDependencies": {
-    "lerna": "^3.21.0"
+    "@babel/core": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "lerna": "^3.21.0",
+    "react": "^16.13.1"
   }
 }
