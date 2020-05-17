@@ -41,11 +41,12 @@ export default function httpsLoader(options = {}) {
     },
 
     getFormat(url, context, defaultGetFormat) {
-      if (
-        (url.startsWith('https://') || url.startsWith('http://')) &&
-        (url.endsWith('.js') || url.endsWith('.mjs'))
-      ) {
-        return { type: 'module' };
+      if (url.startsWith('https://') || url.startsWith('http://')) {
+        if (url.endsWith('.js') || url.endsWith('.mjs')) {
+          return { format: 'module' };
+        } else if (url.endsWith('.wasm')) {
+          return { format: 'wasm' };
+        }
       }
 
       return defaultGetFormat(url, context);
@@ -55,17 +56,17 @@ export default function httpsLoader(options = {}) {
       if (url.startsWith('https://')) {
         return new Promise((resolve, reject) => {
           httpsGet(url, (res) => {
-            let data = '';
-            res.on('data', (chunk) => (data += chunk));
-            res.on('end', () => resolve({ source: data }));
+            const data = [];
+            res.on('data', (chunk) => data.push(chunk));
+            res.on('end', () => resolve({ source: Buffer.concat(data) }));
           }).on('error', (err) => reject(err));
         });
       } else if (allowHttp && url.startsWith('http://')) {
         return new Promise((resolve, reject) => {
           httpGet(url, (res) => {
-            let data = '';
-            res.on('data', (chunk) => (data += chunk));
-            res.on('end', () => resolve({ source: data }));
+            const data = [];
+            res.on('data', (chunk) => data.push(chunk));
+            res.on('end', () => resolve({ source: Buffer.concat(data) }));
           }).on('error', (err) => reject(err));
         });
       }
