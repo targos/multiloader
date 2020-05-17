@@ -40,19 +40,6 @@ export default function httpsLoader(options = {}) {
       return defaultResolve(specifier, context, defaultResolve);
     },
 
-    getFormat(url, context, defaultGetFormat) {
-      if (
-        url.startsWith('https://') ||
-        (allowHttp && url.startsWith('http://'))
-      ) {
-        return {
-          format: 'module',
-        };
-      }
-
-      return defaultGetFormat(url, context, defaultGetFormat);
-    },
-
     getSource(url, context, defaultGetSource) {
       if (url.startsWith('https://')) {
         return new Promise((resolve, reject) => {
