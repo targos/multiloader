@@ -10,9 +10,8 @@ export default function typescriptLoader() {
     },
 
     transformSource(source, context, defaultTransformSource) {
-      const { url, format } = context;
-
-      if (url.endsWith('.ts') && format === 'module') {
+      const { url } = context;
+      if (url.endsWith('.ts')) {
         return {
           source: TypeScript.transpileModule(source, {
             compilerOptions: {
@@ -21,7 +20,6 @@ export default function typescriptLoader() {
           }).outputText,
         };
       }
-
       return defaultTransformSource(source, context);
     },
   };
