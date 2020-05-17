@@ -1,6 +1,6 @@
 {
   "name": "@multiloader/typescript",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "exports": "./src/index.js",
   "type": "module",
