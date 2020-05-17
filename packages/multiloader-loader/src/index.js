@@ -37,7 +37,7 @@ export default function configureLoader(...loaders) {
 
 export async function resolve(specifier, context, defaultResolve, index = 0) {
   if (resolveHooks.hooks[index]) {
-    return resolveHooks.hooks[index](specifier, context, (s, c, d) =>
+    return resolveHooks.hooks[index](specifier, context, (s, c) =>
       resolve(s, c, defaultResolve, index + 1),
     );
   }
@@ -51,7 +51,7 @@ export async function getFormat(
   index = 0,
 ) {
   if (getFormatHooks.hooks[index]) {
-    return getFormatHooks.hooks[index](specifier, context, (s, c, d) =>
+    return getFormatHooks.hooks[index](specifier, context, (s, c) =>
       getFormat(s, c, defaultGetFormat, index + 1),
     );
   }
@@ -65,7 +65,7 @@ export async function getSource(
   index = 0,
 ) {
   if (getSourceHooks.hooks[index]) {
-    return getSourceHooks.hooks[index](specifier, context, (s, c, d) =>
+    return getSourceHooks.hooks[index](specifier, context, (s, c) =>
       getSource(s, c, defaultGetSource, index + 1),
     );
   }
@@ -79,7 +79,7 @@ export async function transformSource(
   index = 0,
 ) {
   if (transformSourceHooks.hooks[index]) {
-    return transformSourceHooks.hooks[index](specifier, context, (s, c, d) =>
+    return transformSourceHooks.hooks[index](specifier, context, (s, c) =>
       transformSource(s, c, defaultTransformSource, index + 1),
     );
   }

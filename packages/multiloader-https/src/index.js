@@ -37,7 +37,18 @@ export default function httpsLoader(options = {}) {
         };
       }
 
-      return defaultResolve(specifier, context, defaultResolve);
+      return defaultResolve(specifier, context);
+    },
+
+    getFormat(url, context, defaultGetFormat) {
+      if (
+        (url.startsWith('https://') || url.startsWith('http://')) &&
+        (url.endsWith('.js') || url.endsWith('.mjs'))
+      ) {
+        return { type: 'module' };
+      }
+
+      return defaultGetFormat(url, context);
     },
 
     getSource(url, context, defaultGetSource) {
@@ -59,7 +70,7 @@ export default function httpsLoader(options = {}) {
         });
       }
 
-      return defaultGetSource(url, context, defaultGetSource);
+      return defaultGetSource(url, context);
     },
   };
 }

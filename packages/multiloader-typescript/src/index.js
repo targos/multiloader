@@ -2,6 +2,13 @@ import TypeScript from 'typescript';
 
 export default function typescriptLoader() {
   return {
+    getFormat(url, context, defaultGetFormat) {
+      if (url.endsWith('.ts')) {
+        return { format: 'module' };
+      }
+      return defaultGetFormat(url, context);
+    },
+
     transformSource(source, context, defaultTransformSource) {
       const { url, format } = context;
 
@@ -15,7 +22,7 @@ export default function typescriptLoader() {
         };
       }
 
-      return defaultTransformSource(source, context, defaultTransformSource);
+      return defaultTransformSource(source, context);
     },
   };
 }

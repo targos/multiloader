@@ -4,7 +4,7 @@ export default function jsonLoader() {
       if (url.endsWith('.json')) {
         return { format: 'json' };
       }
-      return defaultGetFormat(url, context, defaultGetFormat);
+      return defaultGetFormat(url, context);
     },
   };
 }
