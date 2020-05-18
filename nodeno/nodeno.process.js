@@ -4,6 +4,7 @@ const errors = require('./nodeno.errors.js');
 
 module.exports = {
   cwd: process.cwd,
+  exit: process.exit,
   execPath() {
     return process.execPath;
   },
