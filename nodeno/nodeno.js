@@ -11,3 +11,5 @@ globalThis.Deno = {
     typescript: '3.9.2',
   },
 };
+
+globalThis.crypto = require('./crypto.js');

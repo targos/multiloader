@@ -24,7 +24,7 @@ function readTextFileSync(path) {
   }
 }
 
-const fsMethods = {
+module.exports = {
   chmod: fs.promises.chmod,
   chmodSync: fs.chmodSync,
   chown: fs.promises.chown,
@@ -44,5 +44,3 @@ const fsMethods = {
   readTextFile,
   readTextFileSync,
 };
-
-module.exports = fsMethods;
