@@ -5,7 +5,13 @@
 'use strict';
 const colors = require('colors');
 const tests = [];
-module.exports = function ({ name, fn }) {
+module.exports = function (name, fn) {
+
+    if (typeof name === 'object') {
+        name = name.name;
+        fn = name.fn;
+    }
+
     tests.push({ name, fn });
 };
 
