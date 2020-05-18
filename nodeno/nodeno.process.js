@@ -1,6 +1,6 @@
 'use strict';
 
-const errors = require('./deno.errors.js');
+const errors = require('./nodeno.errors.js');
 
 module.exports = {
   cwd: process.cwd,
