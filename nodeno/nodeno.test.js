@@ -5,14 +5,13 @@
 'use strict';
 const colors = require('colors');
 const tests = [];
-module.exports = function (name, fn) {
-
-    if (typeof name === 'object') {
-        name = name.name;
-        fn = name.fn;
+module.exports = function (...args) {
+    if (typeof args[0] === 'object') {
+        const { name, fn } = args[0];
+        tests.push({ name, fn });
+        return;
     }
-
-    tests.push({ name, fn });
+    tests.push({ name: args[0], fn: args[1] });
 };
 
 const getDuration = function (start) {
