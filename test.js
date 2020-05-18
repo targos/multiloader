@@ -31,3 +31,5 @@
 // import './nodeno-tests/signal.js';
 
 // import './nodeno-tests/permissions.js';
+
+// import './nodeno-tests/path.js';
