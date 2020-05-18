@@ -16,3 +16,5 @@ globalThis.Deno = {
 };
 
 globalThis.crypto = require('./crypto.js');
+globalThis.performance = require('perf_hooks').performance;
+globalThis.fetch = require('node-fetch');

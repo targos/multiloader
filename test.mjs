@@ -24,3 +24,6 @@
 // console.log(textproto);
 
 // import './nodeno-tests/asserts.mjs';
+
+// import './nodeno-tests/bench.mjs';
+// import './nodeno-tests/bench2.mjs';
