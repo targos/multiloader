@@ -9,6 +9,7 @@ globalThis.Deno = {
   ...require('./nodeno.process.js'),
   version: require('./nodeno.version.js'),
   inspect: util.inspect,
+  ...require('./nodeno.permissions.js'),
 };
 
 globalThis.crypto = require('./crypto.js');
