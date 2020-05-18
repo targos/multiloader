@@ -1,15 +1,16 @@
-// import { Sha256 } from 'https://deno.land/std/hash/sha256.ts';
-// const sha = new Sha256();
-// sha.update('done');
-// console.log(sha.hex());
+import { Sha256 } from 'https://deno.land/std/hash/sha256.ts';
+const sha = new Sha256();
+sha.update('done');
+console.log(sha.hex());
 
-// import linters from 'https://raw.githubusercontent.com/nodejs/node/master/.github/workflows/linters.yml';
-// console.log(linters);
+import { decode, encode } from 'https://deno.land/std/encoding/utf8.ts';
+console.log(decode(encode('test')));
 
-// import * as sqlite from 'https://deno.land/x/sqlite/build/sqlite.wasm';
-// console.log(sqlite);
+import {
+  parse as parseToml,
+  stringify as stringifyToml,
+} from 'https://deno.land/std/encoding/toml.ts';
+console.log(stringifyToml(parseToml('test=1')));
 
-import React from 'react';
-
-const value = <div>TEST</div>;
-console.log(value);
+import { parse as parseCsv } from 'https://deno.land/std/encoding/csv.ts';
+parseCsv('test,a,b\n1,2,3\n4,5,6').then(console.log, console.error);
