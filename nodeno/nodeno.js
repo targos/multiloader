@@ -7,11 +7,7 @@ globalThis.Deno = {
   errors: require('./nodeno.errors.js'),
   ...require('./nodeno.fs.js'),
   ...require('./nodeno.process.js'),
-  version: {
-    deno: '1.0.0',
-    v8: process.versions.v8,
-    typescript: '3.9.2',
-  },
+  version: require('./nodeno.version.js'),
   inspect: util.inspect,
 };
 

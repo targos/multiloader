@@ -1,6 +1,7 @@
 {
   "name": "root",
   "private": true,
+  "type": "module",
   "scripts": {
     "prepare": "lerna bootstrap"
   },
@@ -10,7 +11,5 @@
     "lerna": "^3.21.0",
     "react": "^16.13.1"
   },
-  "dependencies": {
-    "node-fetch": "^3.0.0-beta.5"
-  }
+  "dependencies": {}
 }
