@@ -1,7 +1,3 @@
-/**
- * Usage:
- * node -r ./nodeno/nodeno.js --loader ./test-loader.js nodeno-tests/test.js <URL TO TEST>
- */
 'use strict';
 const colors = require('colors');
 const tests = [];
