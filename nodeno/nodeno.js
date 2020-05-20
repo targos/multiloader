@@ -14,6 +14,7 @@ window.Deno = {
   ...require('./nodeno.permissions.js'),
   test: require('./nodeno.test'),
   ...require('./nodeno.net.js'),
+  ...require('./nodeno.io.js'),
 };
 
 window.crypto = require('./crypto.js');
