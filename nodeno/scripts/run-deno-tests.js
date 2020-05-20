@@ -32,3 +32,7 @@ for (const url of targets) {
 
 console.log('FAILED', failed.length, '/', targets.length);
 console.log('FAILED tests:\n', failed.map((x) => 'https://deno.land/std/' + x).join('\n'));
+if(failed.length > 0) {
+    process.exit(1);
+}
+
