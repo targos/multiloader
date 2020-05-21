@@ -26,7 +26,7 @@ function copyBytes(src, dst, off = 0) {
     return src.byteLength;
 }
 
-module.exports = class Buffer {
+module.exports.Buffer = class Buffer {
     #buf; // contents are the bytes buf[off : len(buf)]
     #off = 0; // read at buf[off], write at buf[buf.byteLength]
 

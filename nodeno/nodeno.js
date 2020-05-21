@@ -15,7 +15,6 @@ window.Deno = {
   test: require('./nodeno.test'),
   ...require('./nodeno.net.js'),
   ...require('./nodeno.io.js'),
-  Buffer: require('./nodeno.buffer'),
   ...require('./nodeno.buffer')
 };
 
