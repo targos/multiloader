@@ -21,3 +21,4 @@ window.Deno = {
 window.crypto = require('./crypto.js');
 window.performance = require('perf_hooks').performance;
 window.fetch = require('node-fetch');
+window.Headers = require('node-fetch').Headers;
