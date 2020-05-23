@@ -13,8 +13,11 @@ export default function typescriptLoader() {
       const { url } = context;
       if (url.endsWith('.ts')) {
         const transpiled = TypeScript.transpileModule(source, {
+          fileName: context.url,
           compilerOptions: {
+            inlineSourceMap: true,
             module: TypeScript.ModuleKind.ES2015,
+            target: TypeScript.ScriptTarget.ES2019,
           },
         });
         return {
