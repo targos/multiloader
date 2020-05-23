@@ -24,7 +24,7 @@ class UnixAddr extends Addr {
 class Conn {
   #buffers = [];
   #connection;
-  #promise;
+  #promise = null;
 
   constructor(connection) {
     this.localAddr = new NetAddr(
@@ -40,8 +40,9 @@ class Conn {
 
     connection.on('data', (chunk) => {
       this.#buffers.push(chunk);
-      if (this.#promise) {
+      if (this.#promise !== null) {
         this.#promise.resolve();
+        this.#promise = null;
       }
     });
 
