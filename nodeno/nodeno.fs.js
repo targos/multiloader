@@ -1,6 +1,7 @@
 'use strict';
-
+const os = require('os');
 const fs = require('fs');
+const path = require('path');
 const { constants } = fs;
 
 function openOptionsToFlags(options = {}) {
@@ -47,6 +48,24 @@ function readTextFileSync(path) {
       throw err;
     }
   }
+}
+
+function createSync(path) {
+  return openSync(path, {
+    read: true,
+    write: true,
+    truncate: true,
+    create: true,
+  });
+}
+
+function create(path) {
+  return open(path, {
+    read: true,
+    write: true,
+    truncate: true,
+    create: true,
+  });
 }
 
 class File {
@@ -135,6 +154,32 @@ function removeSync(path, options = {}) {
   }
 }
 
+function makeTempDir(options = {}) {
+  const dir = options.dir || os.tmpdir();
+  const prefix = options.prefix || '';
+  return fs.promises.mkdtemp(path.join(dir, prefix));
+}
+
+function makeTempDirSync(options = {}) {
+  const dir = options.dir || os.tmpdir();
+  const prefix = options.prefix || '';
+  return fs.mkdtempSync(path.join(dir, prefix));
+}
+
+function readDir(dirPath) {
+  const dirContent = fs.readdirSync(dirPath);
+  return dirContent.map((x) => {
+    const pt = path.join(dirPath, x);
+    const stats = fs.statSync(pt);
+    return {
+      name: x,
+      isFile: stats.isFile(),
+      isDir: stats.isDirectory(),
+      isSymlink: stats.isSymbolicLink()
+    };
+  });
+}
+
 module.exports = {
   chmod: fs.promises.chmod,
   chmodSync: fs.chmodSync,
@@ -161,4 +206,10 @@ module.exports = {
   openSync,
   remove,
   removeSync,
+  makeTempDir,
+  makeTempDirSync,
+  create,
+  createSync,
+  readDir,
+  readDirSync: readDir
 };
