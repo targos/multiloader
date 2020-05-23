@@ -274,6 +274,32 @@ const writeFileSync = wrapSync(async function writeFileSync(
   });
 });
 
+async function read(rid, buffer) {
+  return new Promise((resolve, reject) => {
+    fs.read(rid, { buffer }, (err, bytesRead) => {
+      if (err) {
+        return reject(err);
+      }
+      if (bytesRead === 0) {
+        return resolve(null);
+      }
+      resolve(bytesRead);
+    });
+  });
+}
+
+function readSync(rid, buffer) {
+  const bytesRead = fs.readSync(rid, buffer);
+  if (bytesRead === 0) {
+    return null;
+  }
+  return bytesRead;
+}
+
+function close(rid) {
+  return fs.closeSync(rid);
+}
+
 module.exports = {
   chmod: wrap(fs.promises.chmod),
   chmodSync: wrapSync(fs.chmodSync),
@@ -308,4 +334,7 @@ module.exports = {
   readDirSync,
   writeFile,
   writeFileSync,
+  read,
+  readSync,
+  close,
 };
