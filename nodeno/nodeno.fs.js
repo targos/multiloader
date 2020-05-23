@@ -4,6 +4,38 @@ const fs = require('fs');
 const path = require('path');
 const { constants } = fs;
 
+const { NotFound } = require('./nodeno.errors');
+
+function wrapSync(fn) {
+  const wrapped = function (...args) {
+    try {
+      return fn(...args);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new NotFound(err.message);
+      }
+      throw err;
+    }
+  };
+  Object.defineProperty(wrapped, 'name', { value: fn.name });
+  return wrapped;
+}
+
+function wrap(fn) {
+  const wrapped = async function (...args) {
+    try {
+      return await fn(...args);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new NotFound(err.message);
+      }
+      throw err;
+    }
+  };
+  Object.defineProperty(wrapped, 'name', { value: fn.name });
+  return wrapped;
+}
+
 function openOptionsToFlags(options = {}) {
   let flags = 0;
   if (options.read && options.write) {
@@ -28,7 +60,37 @@ function openOptionsToFlags(options = {}) {
   return flags;
 }
 
-async function readTextFile(path) {
+function statToFileInfo(stat) {
+  return {
+    isFile: stat.isFile(),
+    isDirectory: stat.isDirectory(),
+    isSymlink: stat.isSymbolicLink(),
+    size: stat.size,
+    mtime: stat.mtime,
+    atime: stat.atime,
+    birthtime: stat.birthtime,
+    dev: stat.dev,
+    ino: stat.ino,
+    mode: stat.mode,
+    nlink: stat.nlink,
+    uid: stat.uid,
+    gid: stat.gid,
+    rdev: stat.rdev,
+    blksize: stat.blksize,
+    blocks: stat.blocks,
+  };
+}
+
+function dirToDirEntry(dir) {
+  return {
+    name: dir.name,
+    isFile: dir.isFile(),
+    isDir: dir.isDirectory(),
+    isSymlink: dir.isSymbolicLink(),
+  };
+}
+
+const readTextFile = wrap(async function readTextFile(path) {
   return fs.promises.readFile(path).catch((err) => {
     if (err.code === 'EISDIR') {
       return '';
@@ -36,9 +98,9 @@ async function readTextFile(path) {
       throw err;
     }
   });
-}
+});
 
-function readTextFileSync(path) {
+const readTextFileSync = wrapSync(function readTextFileSync(path) {
   try {
     return fs.readFileSync(path);
   } catch (err) {
@@ -48,7 +110,7 @@ function readTextFileSync(path) {
       throw err;
     }
   }
-}
+});
 
 function createSync(path) {
   return openSync(path, {
@@ -114,7 +176,7 @@ class File {
   }
 }
 
-function open(path, options = {}) {
+const open = wrap(function open(path, options = {}) {
   return new Promise((resolve, reject) => {
     fs.open(path, openOptionsToFlags(options), options.mode, (err, fd) => {
       if (err) {
@@ -123,14 +185,14 @@ function open(path, options = {}) {
       resolve(new File(fd));
     });
   });
-}
+});
 
-function openSync(path, options = {}) {
+const openSync = wrapSync(function openSync(path, options = {}) {
   const fd = fs.openSync(path, openOptionsToFlags(options), options.mode);
   return new File(fd);
-}
+});
 
-async function remove(path, options = {}) {
+const remove = wrap(async function remove(path, options = {}) {
   if (options.recursive) {
     await fs.promises.rmdir(path, { recursive: true });
   } else {
@@ -140,9 +202,9 @@ async function remove(path, options = {}) {
       await fs.promises.unlink(path);
     }
   }
-}
+});
 
-function removeSync(path, options = {}) {
+const removeSync = wrapSync(function removeSync(path, options = {}) {
   if (options.recursive) {
     fs.rmdirSync(path, { recursive: true });
   } else {
@@ -152,53 +214,85 @@ function removeSync(path, options = {}) {
       fs.unlinkSync(path);
     }
   }
-}
+});
 
-function makeTempDir(options = {}) {
+const makeTempDir = wrap(function makeTempDir(options = {}) {
   const dir = options.dir || os.tmpdir();
   const prefix = options.prefix || '';
   return fs.promises.mkdtemp(path.join(dir, prefix));
-}
+});
 
-function makeTempDirSync(options = {}) {
+const makeTempDirSync = wrapSync(function makeTempDirSync(options = {}) {
   const dir = options.dir || os.tmpdir();
   const prefix = options.prefix || '';
   return fs.mkdtempSync(path.join(dir, prefix));
-}
+});
 
-function readDir(dirPath) {
-  const dirContent = fs.readdirSync(dirPath);
-  return dirContent.map((x) => {
-    const pt = path.join(dirPath, x);
-    const stats = fs.statSync(pt);
-    return {
-      name: x,
-      isFile: stats.isFile(),
-      isDir: stats.isDirectory(),
-      isSymlink: stats.isSymbolicLink()
-    };
+const readDirSync = wrapSync(function readDirSync(dirPath) {
+  const dirContent = fs.readdirSync(dirPath, { withFileTypes: true });
+  return dirContent.map(dirToDirEntry);
+});
+
+const readDir = wrap(function readDir(dirPath) {
+  const dirContent = fs.readdirSync(dirPath, { withFileTypes: true });
+  return dirContent.map(dirToDirEntry);
+});
+
+const lstat = wrap(async function lstat(path) {
+  const stat = await fs.promises.lstat(path);
+  return statToFileInfo(stat);
+});
+
+const lstatSync = wrapSync(function lstatSync(path) {
+  return statToFileInfo(fs.lstatSync(path));
+});
+
+const stat = wrap(async function stat(path) {
+  const stat = await fs.promises.stat(path);
+  return statToFileInfo(stat);
+});
+
+const statSync = wrapSync(function statSync(path) {
+  return statToFileInfo(fs.statSync(path));
+});
+
+const writeFile = wrap(async function writeFile(path, data, options = {}) {
+  return fs.promises.writeFile(path, data, {
+    mode: options.mode,
+    flag: openOptionsToFlags(options),
   });
-}
+});
+
+const writeFileSync = wrapSync(async function writeFileSync(
+  path,
+  data,
+  options = {},
+) {
+  return fs.writeFileSync(path, data, {
+    mode: options.mode,
+    flag: openOptionsToFlags(options),
+  });
+});
 
 module.exports = {
-  chmod: fs.promises.chmod,
-  chmodSync: fs.chmodSync,
-  chown: fs.promises.chown,
-  chownSync: fs.chownSync,
-  copyFile: fs.promises.copyFile,
-  copyFileSync: fs.copyFileSync,
-  lstat: fs.promises.lstat,
-  stat: fs.promises.stat,
-  lstatSync: fs.lstatSync,
-  statSync: fs.statSync,
-  mkdir: fs.promises.mkdir,
-  mkdirSync: fs.mkdirSync,
-  readFile: fs.promises.readFile,
-  readFileSync: fs.readFileSync,
-  rename: fs.promises.rename,
-  renameSync: fs.renameSync,
-  truncate: fs.promises.truncate,
-  truncateSync: fs.truncateSync,
+  chmod: wrap(fs.promises.chmod),
+  chmodSync: wrapSync(fs.chmodSync),
+  chown: wrap(fs.promises.chown),
+  chownSync: wrapSync(fs.chownSync),
+  copyFile: wrap(fs.promises.copyFile),
+  copyFileSync: wrapSync(fs.copyFileSync),
+  lstat,
+  lstatSync,
+  stat,
+  statSync,
+  mkdir: wrap(fs.promises.mkdir),
+  mkdirSync: wrapSync(fs.mkdirSync),
+  readFile: wrap(fs.promises.readFile),
+  readFileSync: wrapSync(fs.readFileSync),
+  rename: wrap(fs.promises.rename),
+  renameSync: wrapSync(fs.renameSync),
+  truncate: wrap(fs.promises.truncate),
+  truncateSync: wrapSync(fs.truncateSync),
   readTextFile,
   readTextFileSync,
   File,
@@ -211,5 +305,7 @@ module.exports = {
   create,
   createSync,
   readDir,
-  readDirSync: readDir
+  readDirSync,
+  writeFile,
+  writeFileSync,
 };
