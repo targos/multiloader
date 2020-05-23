@@ -29,14 +29,36 @@ export default function typescriptLoader() {
   };
 }
 
-const httpServer = /^https:\/\/deno.land\/std[^/]*\/http\/server\.ts$/;
+const toPatch = [
+  {
+    pattern: /std[^/]*\/http\/server\.ts$/,
+    exports: ['Response', 'HTTPOptions', 'HTTPSOptions'],
+  },
+  {
+    pattern: /std[^/]*\/encoding\/_yaml\/parse\.ts$/,
+    exports: ['ParseOptions'],
+  },
+  {
+    pattern: /std[^/]*\/encoding\/_yaml\/stringify\.ts$/,
+    exports: ['DumpOptions'],
+  },
+  {
+    pattern: /std[^/]*\/encoding\/_yaml\/schema\.ts$/,
+    exports: ['SchemaDefinition'],
+  },
+  {
+    pattern: /std[^/]*\/encoding\/_yaml\/type\.ts$/,
+    exports: ['StyleVariant'],
+  },
+];
 
 function patch(context, source) {
-  if (context.url.match(httpServer)) {
-    return addExports(source, ['Response', 'HTTPOptions', 'HTTPSOptions']);
-  } else {
-    return source;
+  for (const { pattern, exports } of toPatch) {
+    if (pattern.test(context.url)) {
+      return addExports(source, exports);
+    }
   }
+  return source;
 }
 
 function addExports(source, exports) {

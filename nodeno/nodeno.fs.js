@@ -2,6 +2,7 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const { isatty } = require('tty');
 const { constants } = fs;
 
 const { NotFound } = require('./nodeno.errors');
@@ -85,7 +86,7 @@ function dirToDirEntry(dir) {
   return {
     name: dir.name,
     isFile: dir.isFile(),
-    isDir: dir.isDirectory(),
+    isDirectory: dir.isDirectory(),
     isSymlink: dir.isSymbolicLink(),
   };
 }
@@ -233,10 +234,19 @@ const readDirSync = wrapSync(function readDirSync(dirPath) {
   return dirContent.map(dirToDirEntry);
 });
 
-const readDir = wrap(function readDir(dirPath) {
-  const dirContent = fs.readdirSync(dirPath, { withFileTypes: true });
-  return dirContent.map(dirToDirEntry);
-});
+async function* readDir(dirPath) {
+  try {
+    const dir = await fs.promises.opendir(dirPath);
+    for await (const entry of dir) {
+      yield dirToDirEntry(entry);
+    }
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new NotFound(err.message);
+    }
+    throw err;
+  }
+}
 
 const lstat = wrap(async function lstat(path) {
   const stat = await fs.promises.lstat(path);
@@ -337,4 +347,15 @@ module.exports = {
   read,
   readSync,
   close,
+  realPath: wrap(fs.promises.realpath),
+  realPathSync: wrapSync(fs.realpathSync),
+  symlink: wrap(fs.promises.symlink),
+  symlinkSync: wrapSync(fs.symlinkSync),
+  readLink: wrap(fs.promises.readlink),
+  readLinkSync: wrapSync(fs.readlinkSync),
+  isatty,
+  utime: wrap(fs.promises.utimes),
+  utimeSync: wrapSync(fs.utimesSync),
+  link: wrap(fs.promises.link),
+  linkSync: wrapSync(fs.linkSync),
 };

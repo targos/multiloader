@@ -1,6 +1,5 @@
 [
   "_util/deep_assign_test.ts",
-  "datetime/test.ts",
   "archive/tar_test.ts",
   "async/deferred_test.ts",
   "bytes/test.ts",
@@ -25,7 +24,7 @@
   "flags/unknown_test.ts",
   "flags/whitespace_test.ts",
   "fmt/colors_test.ts",
-  "fmt/sprintf_test.ts",
+  "fmt/printf_test.ts",
   "fs/_util_test.ts",
   "fs/copy_test.ts",
   "fs/empty_dir_test.ts",

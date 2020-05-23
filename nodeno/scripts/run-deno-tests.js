@@ -16,6 +16,7 @@ const testScriptPath = path.join(
 );
 
 function makeTestUrl(test) {
+  // return pathToFileURL(path.join(__dirname, '../../std', test));
   return 'https://deno.land/std/' + test;
 }
 
@@ -30,7 +31,7 @@ function runTests(testURL) {
     testURL,
   ]);
   if (status !== 0) {
-    console.log('\nFAILED', testURL);
+    console.log('\nFAILED', String(testURL));
     console.log(stdout.toString());
     console.log(stderr.toString());
   } else {

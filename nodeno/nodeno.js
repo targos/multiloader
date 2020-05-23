@@ -1,7 +1,5 @@
 'use strict';
 
-const util = require('util');
-
 globalThis.window = globalThis;
 
 window.Deno = {
@@ -10,12 +8,12 @@ window.Deno = {
   ...require('./nodeno.fs.js'),
   ...require('./nodeno.process.js'),
   version: require('./nodeno.version.js'),
-  inspect: util.inspect,
+  ...require('./nodeno.inspect.js'),
   ...require('./nodeno.permissions.js'),
-  test: require('./nodeno.test'),
+  test: require('./nodeno.test.js'),
   ...require('./nodeno.net.js'),
   ...require('./nodeno.io.js'),
-  ...require('./nodeno.buffer')
+  ...require('./nodeno.buffer.js'),
 };
 
 window.crypto = require('./crypto.js');
