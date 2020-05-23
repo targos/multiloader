@@ -15,6 +15,10 @@ const testScriptPath = path.join(
   'test.js',
 );
 
+function makeTestUrl(test) {
+  return 'https://deno.land/std/' + test;
+}
+
 function runTests(testURL) {
   process.stdout.write('TESTING ' + testURL + ' ');
   const { stdout, stderr, status } = cp.spawnSync(process.execPath, [
@@ -45,18 +49,15 @@ if (args.length > 0) {
 }
 
 const failed = [];
-for (const url of targets) {
-  const res = runTests('https://deno.land/std/' + url);
+for (const target of targets) {
+  const res = runTests(makeTestUrl(target));
   if (!res) {
-    failed.push(url);
+    failed.push(target);
   }
 }
 
 console.log('FAILED', failed.length, '/', targets.length);
-console.log(
-  'FAILED tests:\n',
-  failed.map((x) => 'https://deno.land/std/' + x).join('\n'),
-);
+console.log('FAILED tests:\n', failed.map(makeTestUrl).join('\n'));
 if (failed.length > 0) {
   process.exit(1);
 }
