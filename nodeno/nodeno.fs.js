@@ -157,13 +157,20 @@ class File {
         if (err) {
           return reject(err);
         }
+        if (read === 0) {
+          return resolve(null);
+        }
         resolve(read);
       });
     });
   }
 
   readSync(p) {
-    return fs.readSync(this.rid, p);
+    const read = fs.readSync(this.rid, p);
+    if (read === 0) {
+      return null;
+    }
+    return read;
   }
 
   seek(offset, whence) {
