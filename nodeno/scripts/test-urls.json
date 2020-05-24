@@ -77,6 +77,5 @@
   "testing/bench_test.ts",
   "testing/diff_test.ts",
   "textproto/test.ts",
-  "textproto/test.ts",
   "ws/test.ts"
 ]

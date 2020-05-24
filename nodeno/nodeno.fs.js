@@ -153,7 +153,7 @@ class File {
 
   read(p) {
     return new Promise((resolve, reject) => {
-      fs.read(fd, p, (err, read) => {
+      fs.read(this.rid, { buffer: p }, (err, read) => {
         if (err) {
           return reject(err);
         }
@@ -163,7 +163,7 @@ class File {
   }
 
   readSync(p) {
-    return fs.readSync(fd, p);
+    return fs.readSync(this.rid, p);
   }
 
   seek(offset, whence) {
