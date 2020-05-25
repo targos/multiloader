@@ -23,6 +23,8 @@ function makeTestUrl(test) {
 function runTests(testURL) {
   process.stdout.write('TESTING ' + testURL + ' ');
   const { stdout, stderr, status } = cp.spawnSync(process.execPath, [
+    '--experimental-top-level-await',
+    '--no-warnings',
     '-r',
     rPath,
     '--loader',
