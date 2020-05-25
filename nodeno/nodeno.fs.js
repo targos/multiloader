@@ -5,7 +5,7 @@ const path = require('path');
 const { isatty } = require('tty');
 const { constants } = fs;
 
-const { NotFound } = require('./nodeno.errors');
+const { NotFound, AlreadyExists } = require('./nodeno.errors');
 
 function wrapSync(fn) {
   const wrapped = function (...args) {
@@ -14,6 +14,9 @@ function wrapSync(fn) {
     } catch (err) {
       if (err.code === 'ENOENT') {
         throw new NotFound(err.message);
+      }
+      if (err.code === 'EEXIST') {
+        throw new AlreadyExists(err.message);
       }
       throw err;
     }
@@ -29,6 +32,9 @@ function wrap(fn) {
     } catch (err) {
       if (err.code === 'ENOENT') {
         throw new NotFound(err.message);
+      }
+      if (err.code === 'EEXIST') {
+        throw new AlreadyExists(err.message);
       }
       throw err;
     }
@@ -49,14 +55,13 @@ function openOptionsToFlags(options = {}) {
   if (options.append) {
     flags |= constants.O_APPEND;
   }
-  if (options.truncate) {
-    flags |= constants.O_TRUNC;
-  }
   if (options.create) {
     flags |= constants.O_CREAT;
   }
   if (options.createNew) {
-    flags |= constants.O_EXCL;
+    flags |= constants.O_CREAT | constants.O_EXCL;
+  } else if (options.truncate) {
+    flags |= constants.O_TRUNC;
   }
   return flags;
 }
@@ -319,7 +324,7 @@ const writeFileSync = wrapSync(async function writeFileSync(
   });
 });
 
-async function read(rid, buffer) {
+const read = wrap(async function read(rid, buffer) {
   return new Promise((resolve, reject) => {
     fs.read(rid, { buffer }, (err, bytesRead) => {
       if (err) {
@@ -331,19 +336,34 @@ async function read(rid, buffer) {
       resolve(bytesRead);
     });
   });
-}
+});
 
-function readSync(rid, buffer) {
+const readSync = wrapSync(function readSync(rid, buffer) {
   const bytesRead = fs.readSync(rid, buffer);
   if (bytesRead === 0) {
     return null;
   }
   return bytesRead;
-}
+});
 
-function close(rid) {
+const write = wrap(async function write(rid, data) {
+  return new Promise((resolve, reject) => {
+    fs.write(rid, data, (err, written) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(written);
+    });
+  });
+});
+
+const writeSync = wrapSync(function writeSync(rid, data) {
+  return fs.writeSync(rid, data);
+});
+
+const close = wrapSync(function close(rid) {
   return fs.closeSync(rid);
-}
+});
 
 module.exports = {
   chmod: wrap(fs.promises.chmod),
@@ -383,6 +403,8 @@ module.exports = {
   writeFileSync,
   read,
   readSync,
+  write,
+  writeSync,
   close,
   realPath: wrap(fs.promises.realpath),
   realPathSync: wrapSync(fs.realpathSync),
