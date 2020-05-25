@@ -224,16 +224,44 @@ const removeSync = wrapSync(function removeSync(path, options = {}) {
   }
 });
 
-const makeTempDir = wrap(function makeTempDir(options = {}) {
-  const dir = options.dir || os.tmpdir();
+const makeTempDir = wrap(async function makeTempDir(options = {}) {
+  const dir = options.dir
+    ? `${options.dir}${path.sep}`
+    : `${os.tmpdir()}${path.sep}`;
   const prefix = options.prefix || '';
   return fs.promises.mkdtemp(path.join(dir, prefix));
 });
 
 const makeTempDirSync = wrapSync(function makeTempDirSync(options = {}) {
-  const dir = options.dir || os.tmpdir();
+  const dir = options.dir
+    ? `${options.dir}${path.sep}`
+    : `${os.tmpdir()}${path.sep}`;
   const prefix = options.prefix || '';
   return fs.mkdtempSync(path.join(dir, prefix));
+});
+
+const makeTempFile = wrap(async function makeTempFile(options = {}) {
+  const dir = options.dir
+    ? `${options.dir}${path.sep}`
+    : `${os.tmpdir()}${path.sep}`;
+  const prefix = options.prefix || '';
+  // TODO: use fs.mkstemp when it's in node.
+  const filePath = await fs.promises.mkdtemp(path.join(dir, prefix));
+  await fs.promises.rmdir(filePath);
+  await fs.promises.writeFile(filePath, '');
+  return path.resolve(filePath);
+});
+
+const makeTempFileSync = wrapSync(function makeTempFileSync(options = {}) {
+  const dir = options.dir
+    ? `${options.dir}${path.sep}`
+    : `${os.tmpdir()}${path.sep}`;
+  const prefix = options.prefix || '';
+  // TODO: use fs.mkstemp when it's in node.
+  const filePath = fs.mkdtempSync(path.join(dir, prefix));
+  fs.rmdirSync(filePath);
+  fs.writeFileSync(filePath, '');
+  return path.resolve(filePath);
 });
 
 const readDirSync = wrapSync(function readDirSync(dirPath) {
@@ -345,6 +373,8 @@ module.exports = {
   removeSync,
   makeTempDir,
   makeTempDirSync,
+  makeTempFile,
+  makeTempFileSync,
   create,
   createSync,
   readDir,
